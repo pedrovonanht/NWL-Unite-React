@@ -6,44 +6,7 @@ import {
   ChevronRight,
   ChevronsRight,
 } from "lucide-react";
-import { IconButton } from "./icon-button";
-import { Table } from "./table/table";
-import { TableHeader } from "./table/table-header";
-import { TableCell } from "./table/table-cell";
-import { attendees } from "../data/attendees";
-import dayjs from "dayjs";
-import relativeTime from "dayjs/plugin/relativeTime";
-import "dayjs/locale/pt-br";
-import { useState } from "react";
-
-dayjs.extend(relativeTime);
-dayjs.locale("pt-br");
-
 export function AttendeeList() {
-  const [page, setPage] = useState(1);
-  const totalPages = Math.ceil(attendees.length / 10);
-
-  function goToNextPage() {
-    if (page < totalPages) {
-      setPage(page + 1);
-    }
-  }
-
-  function goToPreviousPage() {
-    if (page > 1) {
-      setPage(page - 1);
-    }
-  }
-  function goToLastPage() {
-    if (page < totalPages) {
-      setPage(totalPages);
-    }
-  }
-  function goToFirstPage() {
-    if (page > 1) {
-      setPage(1);
-    }
-  }
   return (
     <div className=" flex flex-col gap-4">
       <div className=" flex gap-3 items-center">
@@ -53,94 +16,108 @@ export function AttendeeList() {
           <input
             type="text"
             placeholder="buscar participantes..."
-            className="bg-transparent p-0 outline-none text-sm border-0 focus:ring-0"
+            className="bg-transparent border-0 p-0 outline-none text-sm"
           />
         </div>
       </div>
 
-      <Table>
-        <thead>
-          <tr className=" border-b border-white/10">
-            <TableHeader style={{ width: 64 }}>
-              <input
-                type="checkbox"
-                className=" size-4 bg-transparent rounded border border-white/10"
-              />
-            </TableHeader>
-            <TableHeader>Código</TableHeader>
-            <TableHeader>Participante</TableHeader>
-            <TableHeader>Data de inscrição</TableHeader>
-            <TableHeader>Data do check-in</TableHeader>
-            <TableHeader style={{ width: 64 }}></TableHeader>
-          </tr>
-        </thead>
-        <tbody>
-          {attendees.slice((page - 1) * 10, page * 10).map((atendee) => {
-            return (
-              <tr className=" border-b border-white/10" key={atendee.id}>
-                <TableCell>
-                  <input
-                    type="checkbox"
-                    className=" size-4 bg-transparent rounded border border-white/10"
-                  />
-                </TableCell>
-                <TableCell>{atendee.id}</TableCell>
-                <TableCell>
-                  <div className=" flex flex-col gap-1">
-                    <span className=" font-semibold text-zinc-50">
-                      {atendee.name}
-                    </span>
-                    <span>{atendee.email}</span>
-                  </div>
-                </TableCell>
-                <TableCell>{dayjs(atendee.createdAt).fromNow()}</TableCell>
-                <TableCell>{dayjs(atendee.checkedAt).fromNow()}</TableCell>
-                <TableCell>
-                  <IconButton transparent={true}>
-                    <MoreHorizontal />
-                  </IconButton>
-                </TableCell>
-              </tr>
-            );
-          })}
-        </tbody>
-        <tfoot className=" p-4">
-          <tr>
-            <TableCell colSpan={3}>
-              <span className=" text-zinc-300 text-sm">
-                Mostrando 10 de {attendees.length} itens
-              </span>
-            </TableCell>
-            <TableCell colSpan={3} style={{ textAlign: "right" }}>
-              <div className="inline-flex gap-8 items-center">
+      <div className="border border-white/10 rounded-lg">
+        <table className=" w-full">
+          <thead>
+            <tr className=" border-b border-white/10">
+              <th
+                className=" py-3 px-4 text-sm font-semibold text-left"
+                style={{ width: 64 }}
+              >
+                <input
+                  type="checkbox"
+                  className=" size-4 bg-transparent rounded border border-white/10"
+                />
+              </th>
+              <th className=" py-3 px-4 text-sm font-semibold text-left">
+                Código
+              </th>
+              <th className=" py-3 px-4 text-sm font-semibold text-left">
+                Participante
+              </th>
+              <th className=" py-3 px-4 text-sm font-semibold text-left">
+                Data de inscrição
+              </th>
+              <th className=" py-3 px-4 text-sm font-semibold text-left">
+                Data do check-in
+              </th>
+              <th
+                className=" py-3 px-4 text-sm font-semibold text-left"
+                style={{ width: 64 }}
+              ></th>
+            </tr>
+          </thead>
+          <tbody>
+            {Array.from({ length: 8 }).map((_, i) => {
+              return (
+                <tr className=" border-b border-white/10" key={i}>
+                  <td className=" py-3 px-4 text-sm text-left text-zinc-300">
+                    <input
+                      type="checkbox"
+                      className=" size-4 bg-transparent rounded border border-white/10"
+                    />
+                  </td>
+                  <td className=" py-3 px-4 text-sm text-left text-zinc-300">
+                    521793
+                  </td>
+                  <td className=" py-3 px-4 text-sm text-left text-zinc-300">
+                    <div className=" flex flex-col gap-1">
+                      <span className=" font-semibold text-zinc-50">
+                        Pedro Von Anht de Quadros
+                      </span>
+                      <span>pedrovonanht@gmail.com</span>
+                    </div>
+                  </td>
+                  <td className=" py-3 px-4 text-sm text-left text-zinc-300">
+                    7 dias atrás
+                  </td>
+                  <td className=" py-3 px-4 text-sm text-left text-zinc-300">
+                    7 dias atrás
+                  </td>
+                  <td className=" py-3 px-4 text-sm text-left text-zinc-300">
+                    <button>
+                      <MoreHorizontal className=" bg-black/20 border border-white/10 rounded-md p-1.5 size-7" />
+                    </button>
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+          <tfoot className=" p-4">
+            <tr>
+              <td colSpan={3} className="py-3 px-4">
                 <span className=" text-zinc-300 text-sm">
-                  página {page} de {totalPages}
+                  Mostrando 10 de 228 itens
                 </span>
-                <div className=" flex gap-1.5">
-                  <IconButton disabled={page === 1} onClick={goToFirstPage}>
-                    <ChevronsLeft />
-                  </IconButton>
-                  <IconButton disabled={page === 1} onClick={goToPreviousPage}>
-                    <ChevronLeft />
-                  </IconButton>
-                  <IconButton
-                    disabled={page === totalPages}
-                    onClick={goToNextPage}
-                  >
-                    <ChevronRight />
-                  </IconButton>
-                  <IconButton
-                    disabled={page === totalPages}
-                    onClick={goToLastPage}
-                  >
-                    <ChevronsRight />
-                  </IconButton>
+              </td>
+              <td colSpan={3} className="text-right py-3 px-4">
+                <div className="inline-flex gap-8 items-center">
+                  <span className=" text-zinc-300 text-sm">página 1 de 11</span>
+                  <div className=" flex gap-1.5">
+                    <button>
+                      <ChevronsLeft className=" bg-white/10 border border-white/10 rounded-md p-1.5 size-7" />
+                    </button>
+                    <button>
+                      <ChevronLeft className=" bg-white/10 border border-white/10 rounded-md p-1.5 size-7" />
+                    </button>
+                    <button>
+                      <ChevronRight className=" bg-white/10 border border-white/10 rounded-md p-1.5 size-7" />
+                    </button>
+                    <button>
+                      <ChevronsRight className=" bg-white/10 border border-white/10 rounded-md p-1.5 size-7" />
+                    </button>
+                  </div>
                 </div>
-              </div>
-            </TableCell>
-          </tr>
-        </tfoot>
-      </Table>
+              </td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
     </div>
   );
 }
