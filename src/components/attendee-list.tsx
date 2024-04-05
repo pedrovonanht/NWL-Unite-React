@@ -10,19 +10,44 @@ import { IconButton } from "./icon-button";
 import { Table } from "./table/table";
 import { TableHeader } from "./table/table-header";
 import { TableCell } from "./table/table-cell";
-import { attendees } from "../data/attendees";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import "dayjs/locale/pt-br";
-import { useState } from "react";
+import { ChangeEvent, useEffect, useState } from "react";
 
 dayjs.extend(relativeTime);
 dayjs.locale("pt-br");
 
+interface Attendee {
+  id: string;
+  email: string;
+  name: string;
+  createdAt: string;
+  checkedInAt: string | null;
+}
+
 export function AttendeeList() {
   const [page, setPage] = useState(1);
-  const totalPages = Math.ceil(attendees.length / 10);
+  const [attendees, setAttendees] = useState<Attendee[]>([]);
+  const [totalItensApiRequest, setTotalItensApiRequest] = useState(0);
+  const totalPages = Math.ceil(totalItensApiRequest / 10);
+  const [search, setSearch] = useState('')
 
+  useEffect(() => {
+    const url = new URL('http://localhost:3333/events/9e9bd979-9d10-4915-b339-3786b1634f33/attendees')
+
+    url.searchParams.set('pageIndex', String(page-1))
+    if (search.length > 0) {
+    url.searchParams.set('query', search)
+    }
+    
+    fetch(url)
+      .then((response) => response.json())
+      .then((data: any) => {
+        setAttendees(data.attendees);
+        setTotalItensApiRequest(data.total);
+      });
+  }, [page, search]);
   function goToNextPage() {
     if (page < totalPages) {
       setPage(page + 1);
@@ -44,6 +69,10 @@ export function AttendeeList() {
       setPage(1);
     }
   }
+  function onSearchInputChanged (e : ChangeEvent<HTMLInputElement>) {
+    setSearch(e.target.value)
+    setPage(1)
+  }
   return (
     <div className=" flex flex-col gap-4">
       <div className=" flex gap-3 items-center">
@@ -54,6 +83,7 @@ export function AttendeeList() {
             type="text"
             placeholder="buscar participantes..."
             className="bg-transparent p-0 outline-none text-sm border-0 focus:ring-0"
+            onChange={onSearchInputChanged}
           />
         </div>
       </div>
@@ -75,9 +105,9 @@ export function AttendeeList() {
           </tr>
         </thead>
         <tbody>
-          {attendees.slice((page - 1) * 10, page * 10).map((atendee) => {
+          {attendees.map((atendee) => {
             return (
-              <tr className=" border-b border-white/10" key={atendee.id}>
+              <tr className=" border-b border-white/10  hover:bg-zinc-900" key={atendee.id}>
                 <TableCell>
                   <input
                     type="checkbox"
@@ -94,7 +124,13 @@ export function AttendeeList() {
                   </div>
                 </TableCell>
                 <TableCell>{dayjs(atendee.createdAt).fromNow()}</TableCell>
-                <TableCell>{dayjs(atendee.checkedAt).fromNow()}</TableCell>
+                <TableCell>
+                  {atendee.checkedInAt === null ? (
+                    <span className=" text-zinc-400">Não fez o check-in</span>
+                  ) : (
+                    dayjs(atendee.checkedInAt).fromNow()
+                  )}
+                </TableCell>
                 <TableCell>
                   <IconButton transparent={true}>
                     <MoreHorizontal />
@@ -108,13 +144,15 @@ export function AttendeeList() {
           <tr>
             <TableCell colSpan={3}>
               <span className=" text-zinc-300 text-sm">
-                Mostrando 10 de {attendees.length} itens
+                Mostrando {attendees.length >= 10 
+                ? "10" 
+                : attendees.length} de {totalItensApiRequest} itens
               </span>
             </TableCell>
-            <TableCell colSpan={3} style={{ textAlign: "right" }}>
+            <TableCell colSpan={3} className=" text-right">
               <div className="inline-flex gap-8 items-center">
                 <span className=" text-zinc-300 text-sm">
-                  página {page} de {totalPages}
+                  página {totalPages === 0 ? "0" : page} de {totalPages}
                 </span>
                 <div className=" flex gap-1.5">
                   <IconButton disabled={page === 1} onClick={goToFirstPage}>
